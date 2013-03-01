@@ -11,7 +11,7 @@ C3DFACE类
 #include <tuple>
 
 using namespace std;
-typedef tuple<double, double, double> COORDINATE;
+typedef tuple<float, float, float> COORDINATE;
 
 class C3DFACE
 {
@@ -41,5 +41,7 @@ public:
 	COORDINATE GetCoord1();
 	COORDINATE GetCoord2();
 	COORDINATE GetCoord3();
+	// 获得坐标列表
+	vector<COORDINATE> CoordList();
 };
 

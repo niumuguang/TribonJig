@@ -9,6 +9,10 @@
 #include "math3d.h"
 using namespace std;
 
+//    用户定义常量
+#define PI 3.1415926535897932384626433832795f
+
+
 class CJigBlockView : public CView
 {
 protected: // 仅从序列化创建
@@ -25,10 +29,6 @@ public:
 public:
 	virtual void OnDraw(CDC* pDC);  //窗口大小回调函数
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-protected:
-	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
-	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
-	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
 
 // 实现
 public:
@@ -43,9 +43,9 @@ protected:
 // 生成的消息映射函数
 protected:
 	DECLARE_MESSAGE_MAP()
-private:
-	float eye[3];
-	float at[3];
+//private:
+//	float eye[3];
+//	float at[3];
 
 public:
 	CClientDC* m_pDC;
@@ -63,7 +63,7 @@ public:
 	void DrawGround();
 	//////////////////////////////////////////////////////////////////////////
 	// 绘制立方体（测试）
-	void drawCube();
+	void DrawCube();
 	// 绘制平面（测试）
 	void drawPanel(int *index);
 	
@@ -74,19 +74,14 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-	
 
 private:
-	vector<COORDINATE> PlateData;
-	GLfloat nRange;
-	int w;
-	int h;
-	CPoint StartPt, EndPt;
-	double PI;
-	int TimeFirst;
-	GLfloat xRotSum, yRotSum;
-	float keyRoate;
-	
+	GLfloat nRange; // 图形显示比例
+	int w,h; // 窗口的长宽值
+	CPoint StartPt, EndPt; // 记录鼠标中键按下和释放的点
+	GLfloat xRotSum, yRotSum; // 记录总共旋转的角度
+	float keyRoate; // 单位旋转的角度
+	int mouseScale;
 
 public:
 	// 按下鼠标中键
@@ -99,7 +94,6 @@ public:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	// 释放鼠标左键
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-
 	// 叉乘内联函数
 	inline void JigCrossProduct(M3DVector3f result, M3DVector3d u, M3DVector3d v)
 	{

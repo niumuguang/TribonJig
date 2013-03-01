@@ -51,3 +51,13 @@ COORDINATE C3DFACE::GetCoord3()
 {
 	return m_coord3;
 }
+
+vector<COORDINATE> C3DFACE::CoordList()
+{
+	vector<COORDINATE> resList;
+	resList.push_back(m_coord0);
+	resList.push_back(m_coord1);
+	resList.push_back(m_coord2);
+	resList.push_back(m_coord3);
+	return resList;
+}

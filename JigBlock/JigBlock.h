@@ -2,6 +2,16 @@
 // JigBlock.h : JigBlock 应用程序的主头文件
 //
 #pragma once
+#include "stdafx.h"
+#include <vector>
+#include <string.h>
+#include <cstring>
+#include <tuple>
+
+using namespace std;
+
+//typedef tuple<double, double, double> COORDINATE;
+typedef tuple<float, float, float> COORDINATE;
 
 #ifndef __AFXWIN_H__
 	#error "在包含此文件之前包含“stdafx.h”以生成 PCH 文件"
@@ -13,8 +23,9 @@
 // CJigBlockApp:
 // 有关此类的实现，请参阅 JigBlock.cpp
 //
-#include <vector>
+//#include <vector>
 #include "ToolBox.h"
+//#include <vector>
 
 class CJigBlockApp : public CWinApp
 {
@@ -35,13 +46,16 @@ public:
 	//afx_msg void OnFileOpen();
 
 private:
-	vector<COORDINATE> PlateData;
-	vector<COORDINATE> CruveData;
-	//vector<COORDINATE> PolyLineType;
+	vector<COORDINATE> PlateDataList;
+	vector<COORDINATE> m_CruveDataList;
 	vector<POLYLINETYPE> PolyData;
 
 	CDXF_File m_DxfData;
 	vector<CModel> m_ModelList;
+	//vector<COORDINATE> CoorList_Cruve;
+	// testing
+	GLuint testing;
+	vector<GLuint> resShowListVec;
 
 public:
 	vector<COORDINATE> getPlateData(void);
@@ -50,6 +64,7 @@ public:
 
 	CDXF_File getDxfFile();
 	vector<CModel> GetModelList();
+	vector<GLuint> getShowListVec();
 };
 
 extern CJigBlockApp theApp;

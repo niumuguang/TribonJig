@@ -36,5 +36,13 @@ public:
 	vector<CString> m_ModelData;
 	// 模型的类型
 	CString m_ModelType; // OTHERMODEL,CRUVEMODEL,PLANARMODEL 三个种类
+	// 兼容曲面板架
+	// 焊缝数据列表
+
+	// 显示列表名称 容器
+	//vector<GLuint> ShowListVec;
+	// 显示列表 曲面支持
+	GLuint m_Model_PlateList;
+	GLuint m_Model_PolyList;
 };
 

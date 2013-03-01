@@ -18,7 +18,7 @@ DXF文件的实例化类
 #include "PlanarModel.h"
 
 using namespace std;
-typedef tuple<double, double, double> COORDINATE;
+typedef tuple<float, float, float> COORDINATE;
 typedef vector<COORDINATE> POLYLINETYPE;
 
 class CDXF_File
@@ -40,7 +40,7 @@ public:
 	// 分析BLK_Context中每个模型
 	void AnsysDxfData();
 	// 调用种类模型函数 初始化各种模型
-	void TransferModel();
+	//void TransferModel();
 	// 得到BLK名称
 	CString	GetBlockName(vector<CString> InputContext);
 	// 返回dxf文件的模型列表

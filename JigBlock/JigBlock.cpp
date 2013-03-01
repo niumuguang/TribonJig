@@ -203,26 +203,44 @@ CDocument* CJigBlockApp::OpenDocumentFile(LPCTSTR lpszFileName)
 	//Application->MessageBox("警告信息框","警告信息框",MB_ICONWARNING)
 	//MessageBox("这是一个确定 取消的消息框！","标题", MB_OKCANCEL );
 	CToolBox tl_Box;
-	bool tempRes = tl_Box.ReadDxf(lpszFileName, FileContext);
+	bool tempRes = tl_Box.ReadDxf(lpszFileName, FileContext);//读取文件返回 FileContext 
 	if(tempRes == false)
 	{
 		theApp.DoMessageBox(_T("打开文件失败！"),0,1);
 	}
-	m_DxfData = tl_Box.ProgressDxf(FileContext, PlateData, CruveData, PolyData);
+	m_DxfData = tl_Box.ProgressDxf(FileContext);// 计算量大
 	m_ModelList = m_DxfData.GetModelList();
-	//tl_Box.ergodic(FileContext, PlateData, CruveData, PolyData);
+	// 分析的到显示列表
+	// 临时显示列表
+	GLuint tempShowList;
+	for (int idx=0;idx<m_ModelList.size();idx++)
+	{
+		CModel tempModel;
+		tempModel = m_ModelList.at(idx);
+		if (tempModel.GetModelType() == "CRUVEMODEL")
+		{
+			CCruveModel tempCruveModel(tempModel);// 计算量大
+			//m_CruveDataList = tempCruveModel.GetCoorList();
+			tempShowList = tempCruveModel.GetShowPlateList();
+			resShowListVec.push_back(tempShowList);
+		};
+		//else if (tempModel.GetModelType() == "PLANARMODEL")
+		//{
+		//	//CPlanarModel tempPlanarModel(tempModel);
 
+		//}
+	}
 	return CWinApp::OpenDocumentFile(lpszFileName);
 }
 
 vector<COORDINATE> CJigBlockApp::getPlateData( void )
 {
-	return PlateData;
+	return PlateDataList;
 }
 
 vector<COORDINATE> CJigBlockApp::getCruveData( void )
 {
-	return CruveData;
+	return m_CruveDataList;
 }
 
 vector<POLYLINETYPE> CJigBlockApp::getPolyData( void )
@@ -238,5 +256,10 @@ CDXF_File CJigBlockApp::getDxfFile()
 vector<CModel> CJigBlockApp::GetModelList()
 {
 	return m_ModelList;
+}
+
+vector<GLuint> CJigBlockApp::getShowListVec()
+{
+	return resShowListVec;
 }
 

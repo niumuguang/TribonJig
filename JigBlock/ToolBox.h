@@ -16,7 +16,7 @@ ToolBox类
 #include <cstring>
 using namespace std;
 //typedef vector<CString> DXFMODE;
-typedef tuple<double, double, double> COORDINATE;
+typedef tuple<float, float, float> COORDINATE;
 typedef vector<COORDINATE> POLYLINETYPE;
 
 class CToolBox
@@ -27,7 +27,7 @@ public:
 
 public:
 	// 处理Dxf文件数据的入口函数
-	CDXF_File ProgressDxf(vector<CString> FileContext, vector<COORDINATE> &PlateRes, vector<COORDINATE> &CruveRes, vector<POLYLINETYPE> &PolyRes);
+	CDXF_File ProgressDxf(vector<CString> FileContext);
 
 public:
 	// 读取Dxf文件数据

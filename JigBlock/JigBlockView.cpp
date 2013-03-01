@@ -11,18 +11,15 @@
 
 #include "JigBlockDoc.h"
 #include "JigBlockView.h"
+//#include "gl\glew.h"
 #include "gl\glut.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-//using namespace std;
-//#ifdef PI
-
-//#endif
 // CJigBlockView
-
 IMPLEMENT_DYNCREATE(CJigBlockView, CView)
 
 BEGIN_MESSAGE_MAP(CJigBlockView, CView)
@@ -35,38 +32,54 @@ BEGIN_MESSAGE_MAP(CJigBlockView, CView)
 	ON_WM_SIZE()
 	ON_WM_ERASEBKGND()
 	ON_WM_KEYDOWN()
-//	ON_WM_MOUSEHWHEEL()
 	ON_WM_MOUSEWHEEL()
 	ON_WM_MBUTTONDOWN()
-//	ON_WM_NCMBUTTONDOWN()
 ON_WM_MBUTTONUP()
-//ON_WM_MBUTTONDBLCLK()
-//ON_WM_NCLBUTTONDOWN()
 ON_WM_LBUTTONDOWN()
 ON_WM_LBUTTONUP()
 END_MESSAGE_MAP()
 
-// user define constant
+// 用户定义常量
 static GLfloat xRot = 0.0f;
 static GLfloat yRot = 0.0f;
+float lastMatrix[16] ={
+	1.0, 0.0, 0.0, 0.0,
+	0.0, 1.0, 0.0, 0.0,
+	0.0, 0.0, 1.0, 0.0,
+	0.0, 0.0, 0.0, 1.0};
+// 六面体顶点颜色数据
+float color[][3] = {
+	{0.0, 0.0, 1.0},{ 1.0, 1.0, 1.0},{0.0,1.0,0.0},{1.0, 0.0, 0.0},
+	{0.0, 0.0, 1.0},{ 1.0, 1.0, 1.0},{0.0,1.0,0.0},{1.0, 0.0, 0.0}
+};
+// 六面体顶点坐标
+float vertex[][3] =	{
+	{-100.0, -100.0, -100.0},{100.0, -100.0, -100.0},{100.0, -100.0, 100.0},{-100.0, -100.0, 100.0},
+	{-100.0, 100.0, -100.0}, {100.0, 100.0, -100.0}, {100.0, 100.0, 100.0}, {-100.0, 100.0, 100.0}
+};
+int vertexOfPanel[][4] ={
+	{0, 1, 2, 3}, {0, 1, 5, 4}, {4, 5, 6, 7},
+	{7, 6, 2, 3}, {0, 4, 7, 3}, {1, 2, 6, 5}
+};
+
+float eye[3] = {0.0, 0.0, 4000.0};		// 观察者坐标
+float at[3] = {0.0, 0.0, 0.0};		// 观察点坐标
+float up[3] = {0.0, 1000.0, 0.0};		// 观察者的向上向量
 
 // CJigBlockView 构造/析构
-
 CJigBlockView::CJigBlockView()
 {
 	// TODO: 在此处添加构造代码
 	m_pDC = NULL;
-	//nRange = 500.0f;
-	nRange = 10000.0f;
-	PI = 3.1415926535897932384626433832795;
-	TimeFirst = 0;
+	nRange = 59300.0f;
+	
+	//nRange = 5930.f;
 	xRotSum = 0;
 	yRotSum = 0;
-	keyRoate = 5.0f;// 键盘单位移动量
-	//
+	keyRoate = 1.0f;// 键盘单位移动量
 	eye[0]=0.0;eye[1] = 0.0;eye[2]=4.0;
 	at[0]=0.0;at[1]=0.0;at[2]=0.0;
-
+	mouseScale = 1000;
 }
 
 CJigBlockView::~CJigBlockView()
@@ -90,32 +103,10 @@ void CJigBlockView::OnDraw(CDC* /*pDC*/)
 		return;
 
 	// TODO: 在此处为本机数据添加绘制代码
-	//PlateData = theApp.getPlateData();
 	DrawScene();
 }
 
-
-// CJigBlockView 打印
-
-BOOL CJigBlockView::OnPreparePrinting(CPrintInfo* pInfo)
-{
-	// 默认准备
-	return DoPreparePrinting(pInfo);
-}
-
-void CJigBlockView::OnBeginPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
-{
-	// TODO: 添加额外的打印前进行的初始化过程
-}
-
-void CJigBlockView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
-{
-	// TODO: 添加打印后进行的清理过程
-}
-
-
 // CJigBlockView 诊断
-
 #ifdef _DEBUG
 void CJigBlockView::AssertValid() const
 {
@@ -155,14 +146,10 @@ void CJigBlockView::InitOpengl(void)
 	hrc = wglCreateContext(m_pDC->GetSafeHdc());
 	wglMakeCurrent(m_pDC->GetSafeHdc(), hrc);
 	//
-	//ReadFileL(_T("C:\\101BK1A.dxf"), FileData);
-	//
-	//glClearDepth(1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glFrontFace(GL_CCW);
 	glEnable(GL_CULL_FACE);
-	//glutSpecialFunc(SpecialKeys);
 	glEnable(GL_LIGHTING);
 	SetupRC();
 }
@@ -209,19 +196,16 @@ void CJigBlockView::DrawScene(void)
 {
 	//  绘制图形
 	float fZ,bZ;
-
-	//glEnable(GL_DEPTH_TEST);
-	//glDepthFunc(GL_LEQUAL);
 	// Clear the window with current clearing color
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//glClear(GL_COLOR_BUFFER_BIT);
 	fZ = 100.0f;
 	bZ = -100.0f;
-
+	//glEnable(GL_SCISSOR_TEST);
 	//// test line
-	//glPushMatrix();
-	//glRotatef(xRotSum,1,0,0);
-	//glRotatef(yRotSum,0,1,0);
+	glPushMatrix();
+	glRotatef(xRotSum,1,0,0);
+	glRotatef(yRotSum,0,1,0);
 	//GLfloat y;
 	//GLfloat fSize[2];
 	//GLfloat fCurrSize;
@@ -230,26 +214,35 @@ void CJigBlockView::DrawScene(void)
 	//fCurrSize = fCurrSize + 1000;
 	//glColor3f(0,0,0);
 	//glLineWidth(fCurrSize);
-	//glBegin(GL_LINE_STRIP);
-	//glVertex3f(0, -100, 0);
-	//glVertex3f(0, 100, 0);
-	//glVertex3f(100,100,0);
-	//glEnd();
-	//glPopMatrix();
+	glBegin(GL_LINE_STRIP);
+	glVertex3f(0, -100, 0);
+	glVertex3f(0, 100, 0);
+	glVertex3f(100,100,0);
+	glEnd();
 
+	//glEnable(GL_DEPTH_TEST);
+	//glFrontFace(GL_CCW);
+	//glEnable(GL_CULL_FACE);
+	//for (int num=0;num<1000000;num++)
+	//{
+	//	
+	//	glTranslatef(1000,0,0);
+	//	DrawCube();
+	//}
+	
+	glPopMatrix();
 
 	// Set material color, Red
 	DrawCoor();
-	glRotatef(xRot, 1.0f, 0.0f, 0.0f);
-	glRotatef(yRot, 0.0f, 1.0f, 0.0f);
-	
-	glColor3f(0,1,0);
+	//glRotatef(xRot, 1.0f, 0.0f, 0.0f);
+	//glRotatef(yRot, 0.0f, 1.0f, 0.0f);
+	//
+	//glColor3f(0,1,0);
 	DrawPlate();
-	
-	// Restore the matrix state
-	glPopMatrix();
-	
-	//glutSwapBuffers();
+	//
+	//// Restore the matrix state
+	//glPopMatrix();
+
 	SwapBuffers(wglGetCurrentDC());
 }
 
@@ -286,12 +279,15 @@ void CJigBlockView::OnDestroy()
 
 void CJigBlockView::OnSize(UINT nType, int cx, int cy)
 {
-	CView::OnSize(nType, cx, cy);
-
+	//CView::OnSize(nType, cx, cy);
 	// TODO: 在此处添加消息处理程序代码
+	glViewport(0,0,w,h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	//gluPerspective(60.0,(float)w/(float)h,0.1,20.0);
+
 	w=cx;
 	h=cy;
-	//GLfloat nRange = 1200.0f;
 	if (h == 0)
 	{
 		h = 1;
@@ -309,6 +305,8 @@ void CJigBlockView::OnSize(UINT nType, int cx, int cy)
 		glOrtho (-nRange*w/h, nRange*w/h, -nRange, nRange, -nRange*2.0f, nRange*2.0f);
 	}
 	glMatrixMode(GL_MODELVIEW);
+	//gluLookAt(eye[0],eye[1],eye[2],at[0],at[1],at[2],up[0],up[1],up[2]);
+
 	glLoadIdentity();
 }
 
@@ -317,7 +315,6 @@ BOOL CJigBlockView::OnEraseBkgnd(CDC* pDC)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	return TRUE;
-	//return CView::OnEraseBkgnd(pDC);
 }
 
 void CJigBlockView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -351,10 +348,7 @@ void CJigBlockView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	yRot = (GLfloat)((const int)yRot % 360);
 	xRotSum = xRotSum + xRot;
 	yRotSum = yRotSum + yRot;
-	//glRotatef(xRot, 1.0f, 0.0f, 0.0f);
-	//glRotatef(yRot, 0.0f, 1.0f, 0.0f);
 	m_pDocument->UpdateAllViews(NULL);
-	//CView::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
 void CJigBlockView::SetupRC( void )
@@ -372,7 +366,6 @@ void CJigBlockView::SetupRC( void )
 	glEnable(GL_LIGHTING);
 	// Setup and enable light 0
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,whiteLight);
-	//glLightfv(GL_LIGHT0,GL_AMBIENT,sourceLight);
 	glLightfv(GL_LIGHT0,GL_DIFFUSE,sourceLight);
 	glLightfv(GL_LIGHT0,GL_POSITION,lightPos);
 	glEnable(GL_LIGHT0);
@@ -384,16 +377,6 @@ void CJigBlockView::SetupRC( void )
 	// Black blue background
 	glClearColor(0.4f, 0.4f, 0.4f, 0.0f );
 }
-//void CJigBlockView::OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt)
-//{
-//	// 此功能要求 Windows Vista 或更高版本。
-//	// _WIN32_WINNT 符号必须 >= 0x0600。
-//	// TODO: 在此添加消息处理程序代码和/或调用默认值
-//	MessageBox(_T("ON Mouse Whell"));
-//
-//	CView::OnMouseHWheel(nFlags, zDelta, pt);
-//}
-
 
 BOOL CJigBlockView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
@@ -401,17 +384,16 @@ BOOL CJigBlockView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	//MessageBox(_T("ON Mouse Whell"));
 	if (zDelta > 0)
 	{
-		nRange = nRange + 100;
+		nRange = nRange + mouseScale;
 	}
 	else
 	{
-		nRange = nRange - 100;
+		nRange = nRange - mouseScale;
 	}
 	if (h == 0)
 	{
 		h = 1;
 	}
-	//glViewport(0,0,w,h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
@@ -476,44 +458,105 @@ double getDist(COORDINATE pt1, COORDINATE pt2)
 // Create Model: Planar Plate, Cruve Plate, PolyLine;
 void CJigBlockView::DrawPlate()
 {
-	//vector<POLYLINETYPE> PolyData = theApp.getPolyData();
-	//vector<COORDINATE> PlateData = theApp.getPlateData();
-	//vector<COORDINATE> CruveData = theApp.getCruveData();
-	// 获取读取的Dxf文件类
-	//CDXF_File tempDxfData = theApp.getDxfFile();
-	// 从Dxf文件类获取模型类列表
-	vector<CModel> tempModelList = theApp.GetModelList();
-	for (int i=0; i<tempModelList.size(); i++)
+ 	//vector<COORDINATE> tempShowList = theApp.getCruveData();
+	//M3DVector3f tempCruveList[1000] = {0};
+	//vector<M3DVector3f> tempTest;
+	//float tempCruveList[1000][3];
+	//
+	//COORDINATE tempUnit;
+	//vector<COORDINATE> tempCruveList;
+	vector<GLuint> test = theApp.getShowListVec();
+ 	for(int i=0; i<test.size(); i++)
 	{
-		CModel tempModel;
-		tempModel = tempModelList.at(i);
-		if (tempModel.GetModelType() == "CRUVEMODEL")
-		{
-			CCruveModel tempCruveModel(tempModel);
-			vector<C3DFACE> temp3DFaceList = tempCruveModel.Get3DFaceList();
-			for (int i=0;i<temp3DFaceList.size();i++)
-			{
-				C3DFACE temp3DFace = temp3DFaceList.at(i);
-
-				COORDINATE tempCoor0 = temp3DFace.GetCoord0();
-				COORDINATE tempCoor1 = temp3DFace.GetCoord1();
-				COORDINATE tempCoor2 = temp3DFace.GetCoord2();
-				COORDINATE tempCoor3 = temp3DFace.GetCoord3();
-				COORDINATE AxieCoor = temp3DFaceList.at (0).GetCoord0();
-				//glTranslatef(-get<0>(AxieCoor),-get<1>(AxieCoor),-get<2>(AxieCoor));
-				glPushMatrix();
-				glTranslatef(-get<0>(AxieCoor),-get<1>(AxieCoor),-get<2>(AxieCoor));
-				//glTranslatef(-10000,-700,-2225);
-				glBegin(GL_POLYGON);
-				glVertex3f(get<0>(tempCoor0),get<1>(tempCoor0),get<2>(tempCoor0));
-				glVertex3f(get<0>(tempCoor1),get<1>(tempCoor1),get<2>(tempCoor1));
-				glVertex3f(get<0>(tempCoor2),get<1>(tempCoor2),get<2>(tempCoor2));
-				glEnd();
-				glPopMatrix();
-			}
-			//tempCruveModel.ShowPlate();
-		}
+		glPushMatrix();
+		glRotatef(xRotSum,1,0,0);
+		glRotatef(yRotSum,0,1,0);
+		glCallList(test.at(i));
+		glPopMatrix();
 	}
+	
+
+	//testing[0][0] = 0.00;
+	//int num = 0;
+	//if (tempShowList.size() != 0)
+	//{ 
+	//	for (int i=0; i<1000;i++)
+	//	{
+	//		//M3DVector3f testM3D;
+	//		get<0>(tempUnit) = get<0>(tempShowList[i]);
+	//		get<1>(tempUnit) = get<1>(tempShowList[i]);
+	//		get<2>(tempUnit) = get<2>(tempShowList[i]);
+	//		tempCruveList.push_back(tempUnit);
+	//		//tempTest.push_back();
+	//		//
+	//		//tempCruveList[i][0] = get<0>(tempShowList[i]);
+	//		//tempCruveList[i][1] = get<1>(tempShowList[i]);
+	//		//tempCruveList[i][2] = get<2>(tempShowList[i]);
+	//	}
+	//	//
+	//	
+	//	glPushMatrix();
+	//	glRotatef(xRotSum,1,0,0);
+	//	glRotatef(yRotSum,0,1,0);
+	//	//GLfloat y;
+	//	//GLfloat fSize[2];
+	//	//GLfloat fCurrSize;
+	//	//glGetFloatv(GL_LINE_WIDTH_RANGE, fSize);
+	//	//fCurrSize = fSize[0];
+	//	//fCurrSize = fCurrSize + 1000;
+	//	glColor3f(0,0,0);
+	//	//glLineWidth(fCurrSize);
+	//	//glBegin(GL_LINE_STRIP);
+	//	//for (int i=0;i<1000;i++)
+	//	//{
+	//	//	glVertex3f(get<0>(tempCruveList.at(i)),get<0>(tempCruveList.at(i)),get<0>(tempCruveList.at(i)));
+	//	//	//glArrayElement(i);
+	//	//}
+	//	//glEnd();
+	//	glEnableClientState(GL_VERTEX_ARRAY);
+	//	glVertexPointer(1000,GL_FLOAT,0,&tempCruveList);
+	//	glDrawArrays(GL_POINT_SPRITE,0,3);
+	//	//glDisableClientState(GL_VERTEX_ARRAY);
+	//	glPopMatrix();
+	//}
+	
+
+	// 从Dxf文件类获取模型类列表
+	//vector<CModel> tempModelList = theApp.GetModelList();
+
+	//for (int i=0; i<tempModelList.size(); i++)
+	//{
+	//	CModel tempModel;
+	//	tempModel = tempModelList.at(i);
+	//	if (tempModel.GetModelType() == "CRUVEMODEL")
+	//	{
+	//		CCruveModel tempCruveModel(tempModel);
+	//		// 得到面列表
+	//		vector<C3DFACE> temp3DFaceList = tempCruveModel.Get3DFaceList();
+	//		// 遍历每个面
+	//		for (int i=0;i<temp3DFaceList.size();i++)
+	//		{
+	//			C3DFACE temp3DFace = temp3DFaceList.at(i);
+
+	//			COORDINATE tempCoor0 = temp3DFace.GetCoord0();
+	//			COORDINATE tempCoor1 = temp3DFace.GetCoord1();
+	//			COORDINATE tempCoor2 = temp3DFace.GetCoord2();
+	//			COORDINATE tempCoor3 = temp3DFace.GetCoord3();
+	//			COORDINATE AxieCoor = temp3DFaceList.at (0).GetCoord0();
+	//			//glTranslatef(-get<0>(AxieCoor),-get<1>(AxieCoor),-get<2>(AxieCoor));
+	//			glPushMatrix();
+	//			glTranslatef(-get<0>(AxieCoor),-get<1>(AxieCoor),-get<2>(AxieCoor));
+	//			//glTranslatef(-10000,-700,-2225);
+	//			glBegin(GL_POLYGON);
+	//			glVertex3f(get<0>(tempCoor0),get<1>(tempCoor0),get<2>(tempCoor0));
+	//			glVertex3f(get<0>(tempCoor1),get<1>(tempCoor1),get<2>(tempCoor1));
+	//			glVertex3f(get<0>(tempCoor2),get<1>(tempCoor2),get<2>(tempCoor2));
+	//			glEnd();
+	//			glPopMatrix();
+	//		}
+	//		//tempCruveModel.ShowPlate();
+	//	}
+	//}
 
 	//if (PlateData.size() == 0 && CruveData.size() == 0 && PolyData.size() == 0)
 	//{
@@ -571,12 +614,8 @@ void CJigBlockView::DrawPlate()
 
 void CJigBlockView::DrawCoor()
 {
-	//xRotSum = xRotSum + xRot;
-	//yRotSum = yRotSum + yRot;
-	
 	glDisable(GL_CULL_FACE);
 	glPushMatrix();
-	//glTranslatef(0,0.05*nRange,0);
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glutSolidSphere(0.02*abs(nRange),20,10);
 	glPopMatrix();
@@ -590,7 +629,6 @@ void CJigBlockView::DrawCoor()
 	glColor3f(1.0f, 0.0f, 0.0f);
 
 	gluCylinder(pObj, 0.01*abs(nRange), 0.01*abs(nRange), 0.2*abs(nRange), 0.2*abs(nRange), 10);
-	//gluCylinder(pObj, 5, 5, 100, 100, 10);
 	glRotatef(-90, 1,0,0);
 	glColor3f(0.0f, 1.0f, 0.0f);
 	gluCylinder(pObj, 0.01*abs(nRange), 0.01*abs(nRange), 0.2*abs(nRange), 0.2*abs(nRange), 10);
@@ -628,40 +666,24 @@ void CJigBlockView::DrawCoor()
 
 	glColor3f(1.0f, 1.0f, 0.0f);
 	glPushMatrix();
-	//m_pDocument->UpdateAllViews(NULL);
 }
-
-void CJigBlockView::drawCube()
+// 测试函数
+void CJigBlockView::DrawCube()
 {
 	// 测试数据
 	// 六面体六个面分别需要用到的顶点的序号
-	int vertexOfPanel[][4] ={
-		{0, 1, 2, 3}, {0, 1, 5, 4}, {4, 5, 6, 7},
-		{7, 6, 2, 3}, {0, 4, 7, 3}, {1, 2, 6, 5}
-	};
-	//
 	int i;
 	for(i =0;i<6;i++)
 	{
 		drawPanel(vertexOfPanel[i]);
 	}
 }
-
+// 测试函数
 void CJigBlockView::drawPanel(int *index)
 {
 	/*
 	测试数据
 	*/
-	// 六面体顶点颜色数据
-	float color[][3] = {
-		{0.0, 0.0, 1.0},{ 1.0, 1.0, 1.0},{0.0,1.0,0.0},{1.0, 0.0, 0.0},
-		{0.0, 0.0, 1.0},{ 1.0, 1.0, 1.0},{0.0,1.0,0.0},{1.0, 0.0, 0.0}
-	};
-	// 六面体顶点坐标
-	float vertex[][3] =	{
-		{-1.0, -1.0, -1.0},{1.0, -1.0, -1.0},{1.0, -1.0, 1.0},{-1.0, -1.0, 1.0},
-		{-1.0, 1.0, -1.0}, {1.0, 1.0, -1.0}, {1.0, 1.0, 1.0}, {-1.0, 1.0, 1.0}
-	};
 	//////////////////////////////////////////////////////////////////////////
 	int i;
 	glBegin(GL_POLYGON);

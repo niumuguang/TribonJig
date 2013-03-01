@@ -15,27 +15,26 @@ CToolBox::~CToolBox(void)
 // 读取Dxf文件数据
 bool CToolBox::ReadDxf(LPCTSTR FileDir, vector<CString> &ReadContext)
 {
+	// 
 	CStdioFile FileHandle;
 	bool RunState;
 	RunState = FileHandle.Open(FileDir, CFile::modeRead|CFile::typeText);
-
 	if (RunState == true)
 	{
 		CString TextContent;
+		//FileHandle.Read()
 		while(FileHandle.ReadString(TextContent))
 		{
-			ReadContext.push_back(TextContent);
+			ReadContext.push_back(TextContent);// 建立容器依次添加每行文本
 		}
 		return true;
 	}
 	return false;
 }
 // 处理Dxf文件数据的入口函数
-CDXF_File CToolBox::ProgressDxf(vector<CString> FileContext, vector<COORDINATE> &PlateRes, vector<COORDINATE> &CruveRes, vector<POLYLINETYPE> &PolyRes)
+CDXF_File CToolBox::ProgressDxf(vector<CString> FileContext)
 {
 	CDXF_File DXF_File(FileContext);
-	//DXF_File.init(FileContext);
-	//DXF_File.SetFileContext(FileContext);
 	return DXF_File;
 }
 
