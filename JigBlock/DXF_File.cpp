@@ -29,23 +29,12 @@ bool CDXF_File::SetFileContext( vector<CString> InputContext )
 	return true;
 }
 
-void CDXF_File::init( vector<CString> InputContext )
-{
-	SetFileContext(InputContext);  // 设置内容
-	SetSEC();
-	
-	GetBlocksSEC();
-	AnsysDxfData();//计算量大
-
-}
-
 void CDXF_File::GetBlocksSEC()
 {
 	// 将每个BlockSEC 分割成小的Block
 	vector<CString> tempStr;
 	tempStr = BLOCKS_SEC;
 	vector<CString> BLKtemp;
-	//vector<vector<CString>> BLK_Vector;
 	int plusNum = 0;
 	for (int i=0; i<tempStr.size(); i++)
 	{
@@ -58,13 +47,11 @@ void CDXF_File::GetBlocksSEC()
 				plusNum = num;
 			}
 			BLKtemp.push_back(_T("ENDBLK"));
-
 			BLK_Context.push_back(BLKtemp);
 			BLKtemp.clear();
 			i = i + plusNum;
 		}
 	}
-	//BLK_Context = BLK_Vector;
 	return;
 }
 
@@ -77,54 +64,6 @@ void CDXF_File::SetSEC()
 	{
 		if (FileContext[i] == "SECTION")
 		{
-			// Header Section 
-	/*		if (FileContext[i+2] == "HEADER")
-			{
-				idx = i;
-				roo = true;
-				while(roo)
-				{
-					if (FileContext[idx] == "ENDSEC"|| FileContext[idx] == "EOF")
-					{
-						roo = false;
-						HEADER_SEC.push_back(FileContext[idx]);
-					}
-					HEADER_SEC.push_back(FileContext[idx]);
-					idx = idx + 1;
-				}
-			}*/
-			// Classes Section
-			//if (FileContext[i+2] == "CLASSES")
-			//{
-			//	idx = i;
-			//	roo = true;
-			//	while(roo)
-			//	{
-			//		if (FileContext[idx] == "ENDSEC"|| FileContext[idx] == "EOF")
-			//		{
-			//			roo = false;
-			//			CLASSES_SEC.push_back(FileContext[idx]);
-			//		}
-			//		CLASSES_SEC.push_back(FileContext[idx]);
-			//		idx = idx + 1;
-			//	}
-			//}
-			// Tables Section
-			//if (FileContext[i+2] == "TABLES")
-			//{
-			//	idx = i;
-			//	roo = true;
-			//	while(roo)
-			//	{
-			//		if (FileContext[idx] == "ENDSEC"|| FileContext[idx] == "EOF")
-			//		{
-			//			roo = false;
-			//			TABLES_SEC.push_back(FileContext[idx]);
-			//		}
-			//		TABLES_SEC.push_back(FileContext[idx]);
-			//		idx = idx + 1;
-			//	}
-			//}
 			// Blocks Section
 			// Blocks Section 还要拷贝到容器中 浪费时间
 			// 将Blocks Section下的所有Blocks分离并加入之BLOCS_SEC容器
@@ -145,39 +84,6 @@ void CDXF_File::SetSEC()
 					idx = idx + 1;
 				}
 			}
-			// Entities Section
-			/*if (FileContext[i+2] == "ENTITIES")
-			{
-				idx = i;
-				roo = true;
-				while(roo)
-				{
-					if (FileContext[idx] == "ENDSEC"|| FileContext[idx] == "EOF")
-					{
-						roo = false;
-						ENTITIES_SEC.push_back(FileContext[idx]);
-					}
-					ENTITIES_SEC.push_back(FileContext[idx]);
-					idx = idx + 1;
-				}
-			}*/
-			// Objects Section
-			/*if (FileContext[i+2] == "OBJECTS")
-			{
-				idx = i;
-				roo = true;
-				while(roo)
-				{
-					if (FileContext[idx] == "ENDSEC"|| FileContext[idx] == "EOF")
-					{
-						roo = false;
-						OBJECTS_SEC.push_back(FileContext[idx]);
-					}
-					OBJECTS_SEC.push_back(FileContext[idx]);
-					idx = idx + 1;
-				}
-			}*/
-			//
 		}
 	}
 }
@@ -194,19 +100,13 @@ void CDXF_File::AnsysDxfData()//  计算量大
 		//tempModel.SetModelData(tempContext);
 		//ModelList.push_back(tempModel);
 		CString tempName = GetBlockName(tempContext);
-		//if (tempName == "*PAPER_SPACE" || tempName == "*MODEL_SPACE")
+		// 如果 为其他模型 则跳过
+		//if (tempName == "None"||tempName == "*PAPER_SPACE" || tempName == "*MODEL_SPACE")
 		//{
-		//	// 其他模型类型
-		//	COtherModel temp_OtherModel;
-		//	temp_OtherModel.SetModelData(tempContext);
-		//	temp_OtherModel.SetModelName(tempName);
-		//	m_ModelList.push_back(temp_OtherModel);
+		//	
 		//}
-		if (tempName == "None"||tempName == "*PAPER_SPACE" || tempName == "*MODEL_SPACE")
-		{
-			
-		}
-		else
+		//else
+		if(tempName != "None"&&tempName != "*PAPER_SPACE"&&tempName != "*MODEL_SPACE")
 		{
 			for (int i=0;i<tempContext.size();i++)
 			{
@@ -215,11 +115,7 @@ void CDXF_File::AnsysDxfData()//  计算量大
 					if (tempContext.at(i+6) == "POLYLINE")
 					{
 						// 如果模型为曲面板
-						//CCruveModel temp_CruveModel;
-						//temp_CruveModel.SetModelData(tempContext);
-						//temp_CruveModel.SetModelName(tempName);
 						CCruveModel temp_CruveModel(tempContext,tempName);
-
 						temp_CruveModel.DivisionData(i+6);// 计算量大
 						m_ModelList.push_back(temp_CruveModel);
 						break;
@@ -227,9 +123,9 @@ void CDXF_File::AnsysDxfData()//  计算量大
 					else if (tempContext.at(i+6) == "3DFACE")
 					{
 						// 如果模型为平面板架
-						CPlanarModel temp_PlanarModel;
-						temp_PlanarModel.SetModelData(tempContext);
-						temp_PlanarModel.SetModelName(tempName);
+						CPlanarModel temp_PlanarModel(tempContext,tempName);
+						//temp_PlanarModel.SetModelData(tempContext);
+						//temp_PlanarModel.SetModelName(tempName);
 						temp_PlanarModel.DivisionData();
 						m_ModelList.push_back(temp_PlanarModel);
 						break;

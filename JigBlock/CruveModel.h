@@ -37,7 +37,7 @@ public:
 	// 分割Data数据
 	void DivisionData(int idx);
 	// 将数据分为 板数据列表和焊缝数据列表
-	void Plate_Poly_Data();
+	void Plate_Poly_ShowList();
 // 	// 返回面板数据列表
 // 	vector<C3DFACE> Get3DFaceList();
 	// 直接显示面
@@ -64,7 +64,7 @@ private:
 	// 面数据储存列表
 	vector<C3DFACE> m_C3DFace_List;
 	// 所有顶点数据
-	vector<COORDINATE> m_DataCoorList;
+	//vector<COORDINATE> m_DataCoorList;
 	// 面的显示列表
 	//vector<float> m_PlateShowList;
 	//// 显示列表储存名称

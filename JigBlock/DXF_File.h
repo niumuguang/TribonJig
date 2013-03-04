@@ -29,8 +29,6 @@ public:
 	~CDXF_File(void);
 
 public:
-	// 初始化DXF类型
-	void init(vector<CString> InputContext);
 	// 设置 FileContext 整个dxf的内容
 	bool SetFileContext(vector<CString> InputContext);
 	// 按section 分割dxf文件内容

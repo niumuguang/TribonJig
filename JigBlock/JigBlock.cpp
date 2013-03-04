@@ -197,7 +197,6 @@ CDocument* CJigBlockApp::OpenDocumentFile(LPCTSTR lpszFileName)
 	// TODO: 在此添加专用代码和/或调用基类
 	//MessageBox( _T("OPEN OK"));
 	vector<CString> FileContext;
-	//HWND s;
 	////MessageBox(s, _T("aa"), _T("bb"), 0);
 	//this->DoMessageBox(_T("abc"), 0, 1);
 	//Application->MessageBox("警告信息框","警告信息框",MB_ICONWARNING)
@@ -223,7 +222,13 @@ CDocument* CJigBlockApp::OpenDocumentFile(LPCTSTR lpszFileName)
 			//m_CruveDataList = tempCruveModel.GetCoorList();
 			tempShowList = tempCruveModel.GetShowPlateList();
 			resShowListVec.push_back(tempShowList);
-		};
+		}
+		else if (tempModel.GetModelType() == "PLANARMODEL")
+		{
+			CPlanarModel tempPlanarModel(tempModel);
+			tempShowList = tempPlanarModel.GetShowPlateist();
+			resShowListVec.push_back(tempShowList);
+		}
 		//else if (tempModel.GetModelType() == "PLANARMODEL")
 		//{
 		//	//CPlanarModel tempPlanarModel(tempModel);

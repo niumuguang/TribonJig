@@ -61,6 +61,8 @@ public:
 	void DrawCoor();
 	// 绘制地面
 	void DrawGround();
+	// 平面鼠标坐标映射
+	int hemishere(int x, int y, int d, float v[3]);
 	//////////////////////////////////////////////////////////////////////////
 	// 绘制立方体（测试）
 	void DrawCube();
@@ -101,6 +103,7 @@ public:
 		result[1] = -u[0]*v[2] + v[0]*u[2];
 		result[2] = u[0]*v[1] - v[0]*u[1];
 	}
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 };
 
 #ifndef _DEBUG  // JigBlockView.cpp 中的调试版本

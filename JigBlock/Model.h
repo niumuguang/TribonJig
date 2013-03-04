@@ -44,5 +44,8 @@ public:
 	// 显示列表 曲面支持
 	GLuint m_Model_PlateList;
 	GLuint m_Model_PolyList;
+
+	// 显示列表 平面支持
+	GLuint m_Model_PlanarList;
 };
 

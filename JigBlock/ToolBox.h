@@ -38,5 +38,5 @@ public:
 	CString Int2CString(int Num);
 
 	// 新的DXF解析函数
-	void GetPlanerHull(vector<CString> FileContext, int &Planer_IDX, vector<COORDINATE> &PlateRes);
+	//void GetPlanerHull(vector<CString> FileContext, int &Planer_IDX, vector<COORDINATE> &PlateRes);
 }; 

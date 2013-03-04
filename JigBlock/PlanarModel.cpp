@@ -5,6 +5,25 @@
 CPlanarModel::CPlanarModel(void)
 {
 	m_ModelType = _T("PLANARMODEL");
+	m_Model_PlanarList = glGenLists(1);
+}
+
+CPlanarModel::CPlanarModel( vector<CString> Context, CString name )
+{
+	m_Model_PlanarList = glGenLists(1);
+	m_ModelData = Context;
+	m_ModelName = name;
+	m_ModelType = "PLANARMODEL";
+}
+
+CPlanarModel::CPlanarModel( CModel transModel )
+{
+	m_Model_PlanarList = transModel.m_Model_PlanarList;
+	m_ModelName = transModel.m_ModelName;
+	m_ModelData = transModel.m_ModelData;
+	m_ModelType = _T("PLANARMODEL");
+	DivisionData();
+	Planar_ShowList();
 }
 
 
@@ -14,6 +33,7 @@ CPlanarModel::~CPlanarModel(void)
 
 void CPlanarModel::DivisionData()
 {
+	// 将平面板架分割成 小块面板
 	vector<CString> tempData;
 	for (int i=0; i<m_ModelData.size(); i++)
 	{
@@ -24,7 +44,7 @@ void CPlanarModel::DivisionData()
 			for (j; j<m_ModelData.size();j++)
 			{
 				tempData.push_back(m_ModelData.at(j));
-				if (m_ModelData.at(j) == "0")
+				if (m_ModelData.at(j) == "   0")
 				{
 					i=j;
 					break;
@@ -33,4 +53,111 @@ void CPlanarModel::DivisionData()
 			m_PlateList.push_back(tempData);
 		}
 	}
+	Planar_ShowList();
+}
+
+void CPlanarModel::Planar_ShowList()
+{
+	vector<CString> tempData;
+	int ColorIndex;
+	CString tempStr;
+	float tempFloat_X = 0, tempFloat_Y = 0, tempFloat_Z = 0;
+	glNewList(m_Model_PlanarList, GL_COMPILE);
+	glBegin(GL_QUADS);
+	for (int i=0; i<m_PlateList.size(); i++)
+	{
+		tempData = m_PlateList.at(i);
+		if (tempData.size() == 38)
+		{
+			tempStr = tempData.at(10);
+			ColorIndex = _ttoi(tempStr);
+			// 第一个点
+			tempStr = tempData.at(14);
+			_stscanf(tempStr,_T("%f"),&tempFloat_X);
+			tempStr = tempData.at(16);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Y);
+			tempStr = tempData.at(18);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Z);
+			//
+			glVertex3f(tempFloat_X, tempFloat_Y, tempFloat_Z);
+			// 第二个点
+			tempStr = tempData.at(20);
+			_stscanf(tempStr,_T("%f"),&tempFloat_X);
+			tempStr = tempData.at(22);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Y);
+			tempStr = tempData.at(24);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Z);
+			//
+			glVertex3f(tempFloat_X, tempFloat_Y, tempFloat_Z);
+			// 第三个点
+			tempStr = tempData.at(26);
+			_stscanf(tempStr,_T("%f"),&tempFloat_X);
+			tempStr = tempData.at(28);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Y);
+			tempStr = tempData.at(30);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Z);
+			//
+			glVertex3f(tempFloat_X, tempFloat_Y, tempFloat_Z);
+			// 第四个点
+			tempStr = tempData.at(32);
+			_stscanf(tempStr,_T("%f"),&tempFloat_X);
+			tempStr = tempData.at(34);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Y);
+			tempStr = tempData.at(36);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Z);
+			glVertex3f(tempFloat_X, tempFloat_Y, tempFloat_Z);
+		}
+		else if (tempData.size() == 40)
+		{
+			tempStr = tempData.at(10);
+			ColorIndex = _ttoi(tempStr);
+			// 第一个点
+			tempStr = tempData.at(16);
+			_stscanf(tempStr,_T("%f"),&tempFloat_X);
+			tempStr = tempData.at(18);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Y);
+			tempStr = tempData.at(20);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Z);
+			//
+			glVertex3f(tempFloat_X, tempFloat_Y, tempFloat_Z);
+			// 第二个点
+			tempStr = tempData.at(22);
+			_stscanf(tempStr,_T("%f"),&tempFloat_X);
+			tempStr = tempData.at(24);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Y);
+			tempStr = tempData.at(26);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Z);
+			//
+			glVertex3f(tempFloat_X, tempFloat_Y, tempFloat_Z);
+			// 第三个点
+			tempStr = tempData.at(28);
+			_stscanf(tempStr,_T("%f"),&tempFloat_X);
+			tempStr = tempData.at(30);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Y);
+			tempStr = tempData.at(32);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Z);
+			//
+			glVertex3f(tempFloat_X, tempFloat_Y, tempFloat_Z);
+			//tempM3DVector3f[2] = tempDou;
+			//m_PlateShowList.push_back(tempM3DVector3f);
+			// 第四个点
+			tempStr = tempData.at(34);
+			_stscanf(tempStr,_T("%f"),&tempFloat_X);
+			//get<0>(Coord_3) = tempFloat_X;
+			tempStr = tempData.at(36);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Y);
+			//get<1>(Coord_3) = tempFloat_Y;
+			tempStr = tempData.at(38);
+			_stscanf(tempStr,_T("%f"),&tempFloat_Z);
+			//get<2>(Coord_3) = tempFloat_Z;
+			glVertex3f(tempFloat_X, tempFloat_Y, tempFloat_Z);
+		}
+	}
+	glEnd();
+	glEndList();
+}
+
+GLuint CPlanarModel::GetShowPlateist()
+{
+	return m_Model_PlanarList;
 }
