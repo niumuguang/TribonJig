@@ -10,6 +10,7 @@
 
 #include "JigBlockDoc.h"
 #include "JigBlockView.h"
+#include "afxcmn.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -134,7 +135,22 @@ int CJigBlockApp::ExitInstance()
 }
 
 // CJigBlockApp 消息处理程序
-
+//class CProgressDlg:public CDialogEx
+//{
+//public:
+//	CProgressDlg();
+//	enum {IDD = IDD_PROGREDLG};
+//protected:
+//	//virtual void DoDataExchange(CDataExchange* pDX);
+//
+//	// 实现
+//protected:
+//	//DECLARE_MESSAGE_MAP()
+//public:
+//	//	CClientDC* m_pDC;
+//	//	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+//
+//};
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -155,15 +171,18 @@ protected:
 public:
 //	CClientDC* m_pDC;
 //	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	CProgressCtrl m_Progress;
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
 {
+	//m_Progress.SetPos(100);
 }
 
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_PROGRESS1, m_Progress);
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
@@ -193,11 +212,40 @@ CDocument* CJigBlockApp::OpenDocumentFile(LPCTSTR lpszFileName)
 	// TODO: 在此添加专用代码和/或调用基类
 	//MessageBox( _T("OPEN OK"));
 	vector<CString> FileContext;
+	//CAboutDlg aboutDlg;
+	//aboutDlg.DoModal();
+
+	//CProgressDlg testDlg;
+	//testDlg.ModifyStyle(WS_EX_APPWINDOW,0);
+	////testDlg->ModifyStyle(WS_EX_APPWINDOW,0);
+	//testDlg.DoModal();
+	////CWnd *pWnd = AfxGetMainWnd();
+	CProgressDlg* testDlg = new CProgressDlg();
+	testDlg->OnInitDialog();
+	//testDlg->OnInitial();
+
+	testDlg->Create(IDD_PROGREDLG);
+	testDlg->ModifyStyle(WS_EX_APPWINDOW,0);
+	testDlg->CenterWindow();
+	testDlg->ShowWindow(SW_SHOW);
+
+	//CProgressCtrl* ss = testDlg->returnProCtrl();
+	//ss.SetPos(400);
+	/*CProgressDlg* dlg = new CProgressDlg();
+	dlg->Create(CProgressDlg::IDD,GetDesktopWindow());
+	dlg->ShowWindow(SW_SHOW);*/
+
+	//testDlg->ShowWindow(0);
+	//testDlg->GetParent()->EnableWindow(FALSE);
+	//testDlg.Create(_T("s"),pWnd);
+	//testDlg.DoModal();
+	//ProDlg.DoModal();
 	////MessageBox(s, _T("aa"), _T("bb"), 0);
 	//this->DoMessageBox(_T("abc"), 0, 1);
 	//Application->MessageBox("警告信息框","警告信息框",MB_ICONWARNING)
 	//MessageBox("这是一个确定 取消的消息框！","标题", MB_OKCANCEL );
 	CToolBox tl_Box;
+	//testDlg->setPosGo();
 	bool tempRes = tl_Box.ReadDxf(lpszFileName, FileContext);//读取文件返回 FileContext 
 	if(tempRes == false)
 	{
@@ -215,6 +263,7 @@ CDocument* CJigBlockApp::OpenDocumentFile(LPCTSTR lpszFileName)
 		tempModel = m_ModelList.at(idx);
 		if (tempModel.GetModelType() == "CRUVEMODEL")
 		{
+			//testDlg->setPosGo();
 			CCruveModel tempCruveModel(tempModel);// 计算量大
 			//m_CruveDataList = tempCruveModel.GetCoorList();
 			tempShowList = tempCruveModel.GetShowPlateList();
@@ -237,6 +286,7 @@ CDocument* CJigBlockApp::OpenDocumentFile(LPCTSTR lpszFileName)
 
 		//}
 	}
+	//testDlg->DestroyWindow();
 	return CWinApp::OpenDocumentFile(lpszFileName);
 }
 

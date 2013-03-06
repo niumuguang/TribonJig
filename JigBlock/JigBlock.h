@@ -25,6 +25,7 @@ typedef tuple<float, float, float> COORDINATE;
 //
 //#include <vector>
 #include "ToolBox.h"
+#include "ProgressDlg.h"
 //#include <vector>
 
 class CJigBlockApp : public CWinApp

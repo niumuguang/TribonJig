@@ -319,10 +319,10 @@ void CJigBlockView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void CJigBlockView::SetupRC( void )
 {
-	GLfloat  whiteLight[] = { 0.45f, 0.45f, 0.45f, 1.0f };
-	GLfloat  sourceLight[] = { 0.25f, 0.25f, 0.25f, 1.0f };
-	GLfloat	 lightPos[] = { -100.f, 100.0f, 100.0f, 0.0f };
-	GLfloat gray[] = {0.75f, 0.75f, 0.75f, 1.0f};
+	GLfloat  whiteLight[] = { 0.45f, 0.45f, 0.45f, 1.0f }; // 白光初始化
+	GLfloat  sourceLight[] = { 0.25f, 0.25f, 0.25f, 1.0f }; // 
+	GLfloat	 lightPos[] = { -100.f, 100.0f, 100.0f, 0.0f }; // 光照位置
+	GLfloat gray[] = {0.75f, 0.75f, 0.75f, 1.0f};	// 灰光设置
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gray);
 
 	glEnable(GL_DEPTH_TEST);	// Hidden surface removal
@@ -437,6 +437,7 @@ double getDist(COORDINATE pt1, COORDINATE pt2)
 void CJigBlockView::DrawPlate()
 {
 	vector<GLuint> test = theApp.getShowListVec();
+	glColor3f(1,0,0);
 	for(int i=0; i<test.size(); i++)
 	{
 		glPushMatrix();
@@ -449,7 +450,7 @@ void CJigBlockView::DrawPlate()
 	test = theApp.getPolyListVec();
 	for (int i=0; i<test.size(); i++)
 	{
-		glColor3f(1,0,0);
+		
 		glPushMatrix();
 		glRotatef(xRotSum,1,0,0);
 		glRotatef(yRotSum,0,1,0);

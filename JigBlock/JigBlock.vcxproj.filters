@@ -99,6 +99,9 @@
     <ClInclude Include="C3DFACE.h">
       <Filter>头文件\Dxf模型</Filter>
     </ClInclude>
+    <ClInclude Include="ProgressDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="math3d.cpp">
@@ -139,6 +142,9 @@
     </ClCompile>
     <ClCompile Include="C3DFACE.cpp">
       <Filter>源文件\Dxf模型</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressDlg.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
