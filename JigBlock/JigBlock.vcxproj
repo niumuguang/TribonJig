@@ -98,6 +98,7 @@
     <None Include="res\JigBlock.ico" />
     <None Include="res\JigBlock.rc2" />
     <None Include="res\JigBlockDoc.ico" />
+    <None Include="res\toolbar1.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C3DFACE.h" />

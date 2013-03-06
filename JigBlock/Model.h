@@ -43,7 +43,8 @@ public:
 	//vector<GLuint> ShowListVec;
 	// 显示列表 曲面支持
 	GLuint m_Model_PlateList;
-	GLuint m_Model_PolyList;
+	//GLuint m_Model_PolyList0, m_Model_PolyList1, m_Model_PolyList2, m_Model_PolyList3;
+	vector<GLuint> m_PolyVec;
 
 	// 显示列表 平面支持
 	GLuint m_Model_PlanarList;

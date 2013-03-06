@@ -48,6 +48,7 @@ public:
 	vector<COORDINATE> GetCoorList();
 	// 返回显示列表名称
 	GLuint GetShowPlateList();
+	vector<GLuint> GetShowPolyList();
 
 public:
 	// 临时焊缝数据结构 可优化掉

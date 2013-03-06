@@ -50,6 +50,7 @@ void CDXF_File::GetBlocksSEC()
 			BLK_Context.push_back(BLKtemp);
 			BLKtemp.clear();
 			i = i + plusNum;
+			//break;
 		}
 	}
 	return;
@@ -97,15 +98,8 @@ void CDXF_File::AnsysDxfData()//  计算量大
 	for (int i=0; i<BLK_Context.size(); i++)
 	{
 		tempContext = BLK_Context.at(i);
-		//tempModel.SetModelData(tempContext);
-		//ModelList.push_back(tempModel);
 		CString tempName = GetBlockName(tempContext);
 		// 如果 为其他模型 则跳过
-		//if (tempName == "None"||tempName == "*PAPER_SPACE" || tempName == "*MODEL_SPACE")
-		//{
-		//	
-		//}
-		//else
 		if(tempName != "None"&&tempName != "*PAPER_SPACE"&&tempName != "*MODEL_SPACE")
 		{
 			for (int i=0;i<tempContext.size();i++)
@@ -124,8 +118,6 @@ void CDXF_File::AnsysDxfData()//  计算量大
 					{
 						// 如果模型为平面板架
 						CPlanarModel temp_PlanarModel(tempContext,tempName);
-						//temp_PlanarModel.SetModelData(tempContext);
-						//temp_PlanarModel.SetModelName(tempName);
 						temp_PlanarModel.DivisionData();
 						m_ModelList.push_back(temp_PlanarModel);
 						break;
@@ -137,30 +129,6 @@ void CDXF_File::AnsysDxfData()//  计算量大
 	}
 
  }
-
-//void CDXF_File::TransferModel()
-//{
-//	CModel tempModel;
-//	CString ModelType = _T("None");
-//	for (int i = 0; i<m_ModelList.size(); i++)
-//	{
-//		tempModel = m_ModelList.at(i);
-//		ModelType = tempModel.GetModelType();
-//		if (ModelType == "OTHERMODEL")
-//		{
-//			
-//		}
-//		else if(ModelType == "CRUVEMODEL")
-//		{
-//
-//		}
-//		else if(ModelType == "PLANARMODEL")
-//		{
-//
-//		}
-//	}
-//}
-
 
 CString CDXF_File::GetBlockName(vector<CString> InputContext)
 {
@@ -185,4 +153,3 @@ vector<CModel> CDXF_File::GetModelList()
 {
 	return m_ModelList;
 }
-

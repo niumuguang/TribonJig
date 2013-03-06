@@ -49,6 +49,9 @@
     <None Include="res\JigBlock.ico">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="res\toolbar1.bmp">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CruveModel.h">

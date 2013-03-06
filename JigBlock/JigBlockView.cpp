@@ -79,7 +79,6 @@ CJigBlockView::CJigBlockView()
 	// TODO: 在此处添加构造代码
 	m_pDC = NULL;
 	nRange = 59300.0f;
-	
 	//nRange = 5930.f;
 	xRotSum = 0;
 	yRotSum = 0;
@@ -202,55 +201,14 @@ void CJigBlockView::DrawScene(void)
 {
 	glRotatef(theta,axis[0],axis[1],axis[2]);
 	//  绘制图形
-	//float fZ,bZ;
 	// Clear the window with current clearing color
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//glClear(GL_COLOR_BUFFER_BIT);
-	//fZ = 100.0f;
-	//bZ = -100.0f;
-	//glEnable(GL_SCISSOR_TEST);
-	//// test line
-	//glPushMatrix();
-	//glRotatef(xRotSum,1,0,0);
-	//glRotatef(yRotSum,0,1,0);
-	//GLfloat y;
-	//GLfloat fSize[2];
-	//GLfloat fCurrSize;
-	//glGetFloatv(GL_LINE_WIDTH_RANGE, fSize);
-	//fCurrSize = fSize[0];
-	//fCurrSize = fCurrSize + 1000;
-	//glColor3f(0,0,0);
-	//glLineWidth(fCurrSize);
-	//glBegin(GL_LINE_STRIP);
-	//glVertex3f(0, -100, 0);
-	//glVertex3f(0, 100, 0);
-	//glVertex3f(100,100,0);
-	//glEnd();
-
-	//glEnable(GL_DEPTH_TEST);
-	//glFrontFace(GL_CCW);
-	//glEnable(GL_CULL_FACE);
-	//for (int num=0;num<1000000;num++)
-	//{
-	//	
-	//	glTranslatef(1000,0,0);
-	//	DrawCube();
-	//}
-	
 	//glPopMatrix();
 	DrawCoor();
 	// Set material color, Red
-	
-	//glRotatef(xRot, 1.0f, 0.0f, 0.0f);
-	//glRotatef(yRot, 0.0f, 1.0f, 0.0f);
-	//
-	//glColor3f(0,1,0);
 	DrawPlate();
-	
 	//
-	//// Restore the matrix state
-	//glPopMatrix();
-
 	SwapBuffers(wglGetCurrentDC());
 }
 
@@ -259,7 +217,6 @@ int CJigBlockView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CView::OnCreate(lpCreateStruct) == -1)
 		return -1;
-
 	// TODO:  在此添加您专用的创建代码
 	InitOpengl();
 	return 0;
@@ -287,15 +244,16 @@ void CJigBlockView::OnDestroy()
 
 void CJigBlockView::OnSize(UINT nType, int cx, int cy)
 {
-	//CView::OnSize(nType, cx, cy);
+	CView::OnSize(nType, cx, cy);
 	// TODO: 在此处添加消息处理程序代码
 	glViewport(0,0,w,h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	//gluPerspective(60.0,(float)w/(float)h,0.1,20.0);
-
 	w=cx;
 	h=cy;
+	wndHeight = cy;
+	wndWidth = cx;
 	if (h == 0)
 	{
 		h = 1;
@@ -315,7 +273,6 @@ void CJigBlockView::OnSize(UINT nType, int cx, int cy)
 	}
 	glMatrixMode(GL_MODELVIEW);
 	//gluLookAt(eye[0],eye[1],eye[2],at[0],at[1],at[2],up[0],up[1],up[2]);
-
 	glLoadIdentity();
 }
 
@@ -391,21 +348,25 @@ BOOL CJigBlockView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	//MessageBox(_T("ON Mouse Whell"));
-	if (zDelta > 0)
-	{
-		nRange = nRange + mouseScale;
-	}
-	else
-	{
-		nRange = nRange - mouseScale;
-	}
-	if (h == 0)
-	{
-		h = 1;
-	}
 	//glMatrixMode(GL_PROJECTION);
 	//glLoadIdentity();
-	////glMatrixMode(GL_MODELVIEW);
+ 	if (zDelta > 0)
+ 	{
+		glScalef(1.1,1.1,1.1);
+ 		//nRange = nRange + mouseScale;
+ 	}
+ 	else
+ 	{
+		glScalef(0.9,0.9,0.9);
+		//glScalef(-0.1,-0.1,-0.1);
+ 		//nRange = nRange - mouseScale;
+ 	}
+ 	if (h == 0)
+ 	{
+ 		h = 1;
+ 	}
+	
+	//glMatrixMode(GL_MODELVIEW);
 	//if (w<h)
 	//{
 	//	glOrtho (-nRange, nRange, -nRange*h/w, nRange*h/w, -nRange*2.0f, nRange*2.0f);
@@ -414,8 +375,8 @@ BOOL CJigBlockView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	//{
 	//	glOrtho (-nRange*w/h, nRange*w/h, -nRange, nRange, -nRange*2.0f, nRange*2.0f);
 	//}
-	//glMatrixMode(GL_MODELVIEW);
-	//glLoadIdentity();
+// 	glMatrixMode(GL_MODELVIEW);
+// 	glLoadIdentity();
 	//glRotatef(theta,axis[0],axis[1],axis[2]);
 	m_pDocument->UpdateAllViews(NULL);
 	return CView::OnMouseWheel(nFlags, zDelta, pt);
@@ -476,8 +437,19 @@ double getDist(COORDINATE pt1, COORDINATE pt2)
 void CJigBlockView::DrawPlate()
 {
 	vector<GLuint> test = theApp.getShowListVec();
- 	for(int i=0; i<test.size(); i++)
+	for(int i=0; i<test.size(); i++)
 	{
+		glPushMatrix();
+		glRotatef(xRotSum,1,0,0);
+		glRotatef(yRotSum,0,1,0);
+
+		glCallList(test.at(i));
+		glPopMatrix();
+	}
+	test = theApp.getPolyListVec();
+	for (int i=0; i<test.size(); i++)
+	{
+		glColor3f(1,0,0);
 		glPushMatrix();
 		glRotatef(xRotSum,1,0,0);
 		glRotatef(yRotSum,0,1,0);
@@ -626,6 +598,3 @@ void CJigBlockView::OnMouseMove(UINT nFlags, CPoint point)
 
 	CView::OnMouseMove(nFlags, point);
 }
-
-
-

@@ -5,24 +5,21 @@
 CCruveModel::CCruveModel(void)
 {
 	// 生成两个显示列表 板的显示列表 焊缝的显示列表
-	m_Model_PlateList = glGenLists(2);
-	m_Model_PolyList = m_Model_PlateList + 1;
+	m_Model_PlateList = glGenLists(1);
 	m_ModelType = _T("CRUVEMODEL");
 }
 
 // 将基类CModel转换为曲面板模型类
 CCruveModel::CCruveModel( CModel transModel )
 {
-	//m_Model_PlateList = glGenLists(2);
-	//m_Model_PolyList = m_Model_PlateList + 1;
 	m_Model_PlateList = transModel.m_Model_PlateList;
-	m_Model_PolyList = transModel.m_Model_PolyList;
+	m_PolyVec = transModel.m_PolyVec;
 	
 	m_ModelName = transModel.m_ModelName;
 	m_ModelData = transModel.m_ModelData;
 	m_ModelType = _T("CRUVEMODEL");
-	DivisionData();
-	Plate_Poly_ShowList(); // 计算量大
+	//DivisionData();
+	//Plate_Poly_ShowList(); // 计算量大
 	//DisposePointList();
 }
 
@@ -31,8 +28,8 @@ CCruveModel::CCruveModel( vector<CString> TotalData, CString name )
 	m_ModelData = TotalData;
 	m_ModelName = name;
 	m_ModelType = _T("CRUVEMODEL");
-	m_Model_PlateList = glGenLists(2);
-	m_Model_PolyList = m_Model_PlateList + 1;
+	m_Model_PlateList = glGenLists(1);
+	
 }
 
 
@@ -44,7 +41,6 @@ CCruveModel::~CCruveModel(void)
 void CCruveModel::DivisionData()
 {
 	// 计算量偏大
-	//m_ModelData
 	vector<CString> tempData;
 	for (int i=0;i<m_ModelData.size();i++)
 	{
@@ -131,8 +127,10 @@ void CCruveModel::Plate_Poly_ShowList()
 	vector<CString> tempData;
 	int ColorIndex;
 	CString tempStr;
+	vector<CString> tempCString;
 	float tempFloat_X = 0, tempFloat_Y = 0, tempFloat_Z = 0;
 	// 处理板数据得到 板的显示列表
+	bool ColorCounter = false;
 	glNewList(m_Model_PlateList, GL_COMPILE);
 	glBegin(GL_TRIANGLES);
 	for (int i=0; i<m_PlateList.size(); i++)
@@ -142,6 +140,17 @@ void CCruveModel::Plate_Poly_ShowList()
 		{
 			tempStr = tempData.at(10);
 			ColorIndex = _ttoi(tempStr);
+			if (i == 0)
+			{
+				if (ColorIndex == 3)
+				{
+					glColor3f(1,0,0);
+				}
+				else
+				{
+					glColor3f(0,1,0);
+				}
+			}
 			// 第一个点
 			tempStr = tempData.at(14);
 			_stscanf(tempStr,_T("%f"),&tempFloat_X);
@@ -181,6 +190,18 @@ void CCruveModel::Plate_Poly_ShowList()
 		{
 			tempStr = tempData.at(10);
 			ColorIndex = _ttoi(tempStr);
+			if (i == 0)
+			{
+				if (ColorIndex == 3)
+				{
+					//theApp.DoMessageBox("ss",0,0);
+					glColor3f(1,0,0);
+				}
+				else
+				{
+					glColor3f(0,1,0);
+				}
+			}
 			// 第一个点
 			tempStr = tempData.at(16);
 			_stscanf(tempStr,_T("%f"),&tempFloat_X);
@@ -226,18 +247,42 @@ void CCruveModel::Plate_Poly_ShowList()
 	glEndList();
 	//
 	// 处理多短线
-	glNewList(m_Model_PolyList,GL_COMPILE);
-	glBegin(GL_LINE);
+	GLuint tempList;
 	for (int i=0; i<m_PolylineList.size();i++)
 	{
-
+		tempList = glGenLists(1);
+		glNewList(tempList, GL_COMPILE);
+		glBegin(GL_LINE);
+		glColor3f(1,0,0);
+		tempCString = m_PolylineList.at(i);
+		for (int j=0; j<tempCString.size(); j++)
+		{
+			if (tempCString.at(j) == "AcDb3dPolylineVertex")
+			{
+				j = j+2;
+				tempStr = tempCString.at(j);
+				_stscanf(tempStr,_T("%f"),&tempFloat_X);
+				j = j+2;
+				tempStr = tempCString.at(j);
+				_stscanf(tempStr,_T("%f"),&tempFloat_Y);
+				j = j+2;
+				tempStr = tempCString.at(j);
+				_stscanf(tempStr,_T("%f"),&tempFloat_Z);
+				glVertex3f(tempFloat_X,tempFloat_Y,tempFloat_Z);
+			}
+		}
+		glEnd();
+		glEndList();
+		m_PolyVec.push_back(tempList);
 	}
-	glEnd();
-	glEndList();
-
 }
 
 GLuint CCruveModel::GetShowPlateList()
 {
 	return m_Model_PlateList;
+}
+
+vector<GLuint> CCruveModel::GetShowPolyList()
+{
+	return m_PolyVec;
 }

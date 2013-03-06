@@ -96,7 +96,6 @@ BOOL CJigBlockApp::InitInstance()
 	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
 	LoadStdProfileSettings(4);  // 加载标准 INI 文件选项(包括 MRU)
 
-
 	// 注册应用程序的文档模板。文档模板
 	// 将用作文档、框架窗口和视图之间的连接
 	CSingleDocTemplate* pDocTemplate;
@@ -109,12 +108,9 @@ BOOL CJigBlockApp::InitInstance()
 		return FALSE;
 	AddDocTemplate(pDocTemplate);
 
-
 	// 分析标准 shell 命令、DDE、打开文件操作的命令行
 	CCommandLineInfo cmdInfo;
 	ParseCommandLine(cmdInfo);
-
-
 
 	// 调度在命令行中指定的命令。如果
 	// 用 /RegServer、/Register、/Unregserver 或 /Unregister 启动应用程序，则返回 FALSE。
@@ -212,6 +208,7 @@ CDocument* CJigBlockApp::OpenDocumentFile(LPCTSTR lpszFileName)
 	// 分析的到显示列表
 	// 临时显示列表
 	GLuint tempShowList;
+	vector<GLuint> tempPolyList;
 	for (int idx=0;idx<m_ModelList.size();idx++)
 	{
 		CModel tempModel;
@@ -222,6 +219,11 @@ CDocument* CJigBlockApp::OpenDocumentFile(LPCTSTR lpszFileName)
 			//m_CruveDataList = tempCruveModel.GetCoorList();
 			tempShowList = tempCruveModel.GetShowPlateList();
 			resShowListVec.push_back(tempShowList);
+			tempPolyList = tempCruveModel.GetShowPolyList();
+			for (int i=0; i<tempPolyList.size(); i++)
+			{
+				resPolyListVec.push_back(tempPolyList.at(i));
+			}
 		}
 		else if (tempModel.GetModelType() == "PLANARMODEL")
 		{
@@ -266,5 +268,10 @@ vector<CModel> CJigBlockApp::GetModelList()
 vector<GLuint> CJigBlockApp::getShowListVec()
 {
 	return resShowListVec;
+}
+
+vector<GLuint> CJigBlockApp::getPolyListVec()
+{
+	return resPolyListVec;
 }
 

@@ -56,6 +56,7 @@ private:
 	// testing
 	GLuint testing;
 	vector<GLuint> resShowListVec;
+	vector<GLuint> resPolyListVec;
 
 public:
 	vector<COORDINATE> getPlateData(void);
@@ -65,6 +66,7 @@ public:
 	CDXF_File getDxfFile();
 	vector<CModel> GetModelList();
 	vector<GLuint> getShowListVec();
+	vector<GLuint> getPolyListVec();
 };
 
 extern CJigBlockApp theApp;
