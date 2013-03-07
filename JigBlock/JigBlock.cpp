@@ -1,7 +1,6 @@
 
 // JigBlock.cpp : 定义应用程序的类行为。
 //
-
 #include "stdafx.h"
 #include "afxwinappex.h"
 #include "afxdialogex.h"
@@ -11,6 +10,7 @@
 #include "JigBlockDoc.h"
 #include "JigBlockView.h"
 #include "afxcmn.h"
+#include "afxwin.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -45,7 +45,7 @@ CJigBlockApp::CJigBlockApp()
 
 	// TODO: 将以下应用程序 ID 字符串替换为唯一的 ID 字符串；建议的字符串格式
 	//为 CompanyName.ProductName.SubProduct.VersionInformation
-	SetAppID(_T("JigBlock.AppID.NoVersion"));
+	SetAppID(_T("TribonModel.AppID.NoVersion"));
 
 	// TODO: 在此处添加构造代码，
 	// 将所有重要的初始化放置在 InitInstance 中
@@ -88,6 +88,7 @@ BOOL CJigBlockApp::InitInstance()
 	// AfxInitRichEdit2();
 
 	// 标准初始化
+	first_X = -1; first_Y = -1; first_Z = -1;
 	// 如果未使用这些功能并希望减小
 	// 最终可执行文件的大小，则应移除下列
 	// 不需要的特定初始化例程
@@ -134,26 +135,6 @@ int CJigBlockApp::ExitInstance()
 	return CWinApp::ExitInstance();
 }
 
-// CJigBlockApp 消息处理程序
-//class CProgressDlg:public CDialogEx
-//{
-//public:
-//	CProgressDlg();
-//	enum {IDD = IDD_PROGREDLG};
-//protected:
-//	//virtual void DoDataExchange(CDataExchange* pDX);
-//
-//	// 实现
-//protected:
-//	//DECLARE_MESSAGE_MAP()
-//public:
-//	//	CClientDC* m_pDC;
-//	//	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-//
-//};
-
-// 用于应用程序“关于”菜单项的 CAboutDlg 对话框
-
 class CAboutDlg : public CDialogEx
 {
 public:
@@ -172,6 +153,8 @@ public:
 //	CClientDC* m_pDC;
 //	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	CProgressCtrl m_Progress;
+	CButton m_testButton;
+	afx_msg void OnBnClickedButton1();
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
@@ -183,10 +166,12 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_PROGRESS1, m_Progress);
+	DDX_Control(pDX, IDC_BUTTON1, m_testButton);
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 //	ON_WM_KEYDOWN()
+	ON_BN_CLICKED(IDC_BUTTON1, &CAboutDlg::OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 // 用于运行对话框的应用程序命令
@@ -214,21 +199,26 @@ CDocument* CJigBlockApp::OpenDocumentFile(LPCTSTR lpszFileName)
 	vector<CString> FileContext;
 	//CAboutDlg aboutDlg;
 	//aboutDlg.DoModal();
+	//ProTest dd;
+	//dd.DoModal();
 
 	//CProgressDlg testDlg;
 	//testDlg.ModifyStyle(WS_EX_APPWINDOW,0);
 	////testDlg->ModifyStyle(WS_EX_APPWINDOW,0);
 	//testDlg.DoModal();
 	////CWnd *pWnd = AfxGetMainWnd();
-	CProgressDlg* testDlg = new CProgressDlg();
-	testDlg->OnInitDialog();
+	//CProgressDlg* testDlg = new CProgressDlg();
+	//ProTest* testDlg = new ProTest;
+	
+	//testDlg->OnInitDialog();
 	//testDlg->OnInitial();
-
-	testDlg->Create(IDD_PROGREDLG);
-	testDlg->ModifyStyle(WS_EX_APPWINDOW,0);
-	testDlg->CenterWindow();
-	testDlg->ShowWindow(SW_SHOW);
-
+	m_prodlg.Create(IDD_DIALOG1);
+	//testDlg->ModifyStyle(WS_EX_APPWINDOW,0);
+	m_prodlg.CenterWindow();
+	m_prodlg.ShowWindow(SW_SHOW);
+	m_prodlg.m_Pro.SetRange32(0,1000000);
+	m_prodlg.m_Pro.SetStep(1);
+	//m_prodlg.m_Pro.SetPos(10);
 	//CProgressCtrl* ss = testDlg->returnProCtrl();
 	//ss.SetPos(400);
 	/*CProgressDlg* dlg = new CProgressDlg();
@@ -247,18 +237,26 @@ CDocument* CJigBlockApp::OpenDocumentFile(LPCTSTR lpszFileName)
 	CToolBox tl_Box;
 	//testDlg->setPosGo();
 	bool tempRes = tl_Box.ReadDxf(lpszFileName, FileContext);//读取文件返回 FileContext 
+	//m_prodlg.m_Pro.SetPos(10);
 	if(tempRes == false)
 	{
 		theApp.DoMessageBox(_T("打开文件失败！"),0,1);
 	}
+	//m_prodlg.m_Pro.SetPos(30);
 	m_DxfData = tl_Box.ProgressDxf(FileContext);// 计算量大
 	m_ModelList = m_DxfData.GetModelList();
 	// 分析的到显示列表
 	// 临时显示列表
 	GLuint tempShowList;
 	vector<GLuint> tempPolyList;
+	//testDlg->setPosGo();
+	//m_prodlg.m_Pro.SetPos(20);
 	for (int idx=0;idx<m_ModelList.size();idx++)
 	{
+		m_prodlg.m_Pro.OffsetPos(1);
+		//testDlg.m_Pro.SetStep(5);
+		//m_prodlg.m_Pro.OffsetPos(0.1);
+		m_prodlg.OnPaint();
 		CModel tempModel;
 		tempModel = m_ModelList.at(idx);
 		if (tempModel.GetModelType() == "CRUVEMODEL")
@@ -286,7 +284,8 @@ CDocument* CJigBlockApp::OpenDocumentFile(LPCTSTR lpszFileName)
 
 		//}
 	}
-	//testDlg->DestroyWindow();
+	//m_prodlg.m_Pro.SetPos(10000000);
+	m_prodlg.DestroyWindow();
 	return CWinApp::OpenDocumentFile(lpszFileName);
 }
 
@@ -325,3 +324,43 @@ vector<GLuint> CJigBlockApp::getPolyListVec()
 	return resPolyListVec;
 }
 
+ ProgressDlg* CJigBlockApp::getProDlgHandle()
+ {
+ 	return &m_prodlg;
+ }
+
+ GLfloat CJigBlockApp::getFirstX()
+ {
+	 return first_X;
+ }
+
+ void CJigBlockApp::setFirstX(GLfloat firstX)
+ {
+	 first_X = firstX;
+ }
+
+ GLfloat CJigBlockApp::getFirstY()
+ {
+	 return first_Y;
+ }
+
+ void CJigBlockApp::setFirstY( GLfloat firstY )
+ {
+	 first_Y = firstY;
+ }
+
+ GLfloat CJigBlockApp::getFirstZ()
+ {
+	 return first_Z;
+ }
+
+ void CJigBlockApp::setFirstZ( GLfloat firstZ )
+ {
+	 first_Z = firstZ;
+ }
+
+void CAboutDlg::OnBnClickedButton1()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	//m_Progress.SetPos(100);
+}

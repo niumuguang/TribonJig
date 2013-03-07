@@ -101,6 +101,7 @@
     <None Include="res\toolbar1.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BarClass.h" />
     <ClInclude Include="C3DFACE.h" />
     <ClInclude Include="CruveModel.h" />
     <ClInclude Include="DXF_File.h" />
@@ -112,13 +113,14 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="OtherModel.h" />
     <ClInclude Include="PlanarModel.h" />
-    <ClInclude Include="ProgressDlg.h" />
+    <ClInclude Include="ProDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="ToolBox.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BarClass.cpp" />
     <ClCompile Include="C3DFACE.cpp" />
     <ClCompile Include="CruveModel.cpp" />
     <ClCompile Include="DXF_File.cpp" />
@@ -130,7 +132,7 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="OtherModel.cpp" />
     <ClCompile Include="PlanarModel.cpp" />
-    <ClCompile Include="ProgressDlg.cpp" />
+    <ClCompile Include="ProDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

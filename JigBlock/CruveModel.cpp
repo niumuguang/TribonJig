@@ -1,5 +1,7 @@
 #include "StdAfx.h"
 #include "CruveModel.h"
+#include "ProDlg.h"
+#include "JigBlock.h"
 
 
 CCruveModel::CCruveModel(void)
@@ -84,15 +86,20 @@ void CCruveModel::DivisionData(int idx)
 {
 	// 计算量偏大
 	// 区分开曲面和焊缝
+	ProgressDlg* prodlg;
+	prodlg = theApp.getProDlgHandle();
+
 	vector<CString> tempData;
 	for (int i=idx;i<m_ModelData.size();i++)
 	{
+		prodlg->m_Pro.StepIt();
 		tempData.clear();
 		if (m_ModelData.at(i) == "POLYLINE")
 		{
 			int j = i;
 			for (j; j<m_ModelData.size(); j++)
 			{
+				prodlg->m_Pro.StepIt();
 				tempData.push_back(m_ModelData.at(j));
 				if (m_ModelData.at(j) == "SEQEND")
 				{
@@ -108,6 +115,7 @@ void CCruveModel::DivisionData(int idx)
 			int j = i;
 			for (j; j<m_ModelData.size(); j++)
 			{
+				prodlg->m_Pro.StepIt();
 				tempData.push_back(m_ModelData.at(j));
 				if (m_ModelData.at(j) == "   0")
 				{
@@ -131,10 +139,18 @@ void CCruveModel::Plate_Poly_ShowList()
 	float tempFloat_X = 0, tempFloat_Y = 0, tempFloat_Z = 0;
 	// 处理板数据得到 板的显示列表
 	bool ColorCounter = false;
+	bool firstPoint = false;
+	if (theApp.getFirstX() == -1)
+	{
+		firstPoint = true;
+	}
 	glNewList(m_Model_PlateList, GL_COMPILE);
 	glBegin(GL_TRIANGLES);
+	ProgressDlg* prodlg;
+	prodlg = theApp.getProDlgHandle();
 	for (int i=0; i<m_PlateList.size(); i++)
 	{
+		prodlg->m_Pro.StepIt();
 		tempData = m_PlateList.at(i);
 		if (tempData.size() == 38)
 		{
@@ -158,6 +174,11 @@ void CCruveModel::Plate_Poly_ShowList()
 			_stscanf(tempStr,_T("%f"),&tempFloat_Y);
 			tempStr = tempData.at(18);
 			_stscanf(tempStr,_T("%f"),&tempFloat_Z);
+			if (firstPoint == true)
+			{
+				theApp.setFirstX(tempFloat_X);theApp.setFirstY(tempFloat_Y);theApp.setFirstZ(tempFloat_Z);
+				firstPoint == false;
+			}
 			//
 			glVertex3f(tempFloat_X, tempFloat_Y, tempFloat_Z);
 			// 第二个点
@@ -209,6 +230,11 @@ void CCruveModel::Plate_Poly_ShowList()
 			_stscanf(tempStr,_T("%f"),&tempFloat_Y);
 			tempStr = tempData.at(20);
 			_stscanf(tempStr,_T("%f"),&tempFloat_Z);
+			if (firstPoint == true)
+			{
+				theApp.setFirstX(tempFloat_X);theApp.setFirstY(tempFloat_Y);theApp.setFirstZ(tempFloat_Z);
+				firstPoint == false;
+			}
 			//
 			glVertex3f(tempFloat_X, tempFloat_Y, tempFloat_Z);
 			// 第二个点
@@ -250,6 +276,7 @@ void CCruveModel::Plate_Poly_ShowList()
 	GLuint tempList;
 	for (int i=0; i<m_PolylineList.size();i++)
 	{
+		prodlg->m_Pro.StepIt();
 		tempList = glGenLists(1);
 		glNewList(tempList, GL_COMPILE);
 		glBegin(GL_LINE);
@@ -257,6 +284,7 @@ void CCruveModel::Plate_Poly_ShowList()
 		tempCString = m_PolylineList.at(i);
 		for (int j=0; j<tempCString.size(); j++)
 		{
+			prodlg->m_Pro.StepIt();
 			if (tempCString.at(j) == "AcDb3dPolylineVertex")
 			{
 				j = j+2;

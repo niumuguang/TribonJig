@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "DXF_File.h"
-
+#include "ProDlg.h"
+#include "JigBlock.h"
 
 CDXF_File::CDXF_File(void)
 {
@@ -8,10 +9,16 @@ CDXF_File::CDXF_File(void)
 
 CDXF_File::CDXF_File( vector<CString> InputContext )
 {
+	
+	MainPro = theApp.getProDlgHandle();
 	SetFileContext(InputContext);  // 设置内容到 CDXF_File 类
+	
 	SetSEC(); // 分割每一个 Section， 这步有点多余
+	//MainPro->m_Pro.SetPos(30);
 	GetBlocksSEC();
+	//MainPro->m_Pro.SetPos(40);
 	AnsysDxfData();// 计算量大
+	//MainPro->m_Pro.SetPos(45);
 }
 
 
@@ -25,6 +32,7 @@ bool CDXF_File::SetFileContext( vector<CString> InputContext )
 	{
 		return false;
 	}
+	MainPro->m_Pro.StepIt();
 	FileContext = InputContext;
 	return true;
 }
@@ -38,10 +46,12 @@ void CDXF_File::GetBlocksSEC()
 	int plusNum = 0;
 	for (int i=0; i<tempStr.size(); i++)
 	{
+		MainPro->m_Pro.StepIt(); 
 		if (tempStr[i] == "BLOCK")
 		{
 			for(int num=0; tempStr[i+num] != "ENDBLK";num++)
 			{
+				MainPro->m_Pro.StepIt();
 				// 如果发现Block终止标识，加入最后一个Block内容，设置跳跃值plusNum
 				BLKtemp.push_back(tempStr[i+num]);
 				plusNum = num;
@@ -63,6 +73,7 @@ void CDXF_File::SetSEC()
 	int idx = 0;
 	for (int i = 0; i<FileContext.size(); i++)
 	{
+		MainPro->m_Pro.StepIt();
 		if (FileContext[i] == "SECTION")
 		{
 			// Blocks Section
@@ -74,6 +85,7 @@ void CDXF_File::SetSEC()
 				roo = true;
 				while(roo)
 				{
+					MainPro->m_Pro.StepIt();
 					if (FileContext[idx] == "ENDSEC"|| FileContext[idx] == "EOF")
 					{
 						// 发现结束标识 则将最后一个Block加入
@@ -97,6 +109,7 @@ void CDXF_File::AnsysDxfData()//  计算量大
 	// 遍历所有Block数据
 	for (int i=0; i<BLK_Context.size(); i++)
 	{
+		MainPro->m_Pro.StepIt();
 		tempContext = BLK_Context.at(i);
 		CString tempName = GetBlockName(tempContext);
 		// 如果 为其他模型 则跳过
@@ -104,6 +117,7 @@ void CDXF_File::AnsysDxfData()//  计算量大
 		{
 			for (int i=0;i<tempContext.size();i++)
 			{
+				MainPro->m_Pro.StepIt();
 				if (tempContext.at(i) == "Object name")
 				{
 					if (tempContext.at(i+6) == "POLYLINE")

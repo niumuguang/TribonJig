@@ -15,6 +15,7 @@ CToolBox::~CToolBox(void)
 // 读取Dxf文件数据
 bool CToolBox::ReadDxf(LPCTSTR FileDir, vector<CString> &ReadContext)
 {
+	prodlg = theApp.getProDlgHandle();
 	CStdioFile FileHandle;
 	bool RunState;
 	RunState = FileHandle.Open(FileDir, CFile::modeRead|CFile::typeText);
@@ -23,6 +24,7 @@ bool CToolBox::ReadDxf(LPCTSTR FileDir, vector<CString> &ReadContext)
 		CString TextContent;
 		while(FileHandle.ReadString(TextContent))
 		{
+			prodlg->m_Pro.StepIt();
 			ReadContext.push_back(TextContent);// 建立容器依次添加每行文本
 		}
 		return true;

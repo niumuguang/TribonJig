@@ -84,6 +84,7 @@ private:
 	GLfloat xRotSum, yRotSum; // 记录总共旋转的角度
 	float keyRoate; // 单位旋转的角度
 	int mouseScale;
+	
 
 public:
 	// 按下鼠标中键

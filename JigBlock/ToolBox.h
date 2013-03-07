@@ -14,6 +14,7 @@ ToolBox类
 #include <iostream>
 #include <string.h>
 #include <cstring>
+#include "ProDlg.h"
 using namespace std;
 //typedef vector<CString> DXFMODE;
 typedef tuple<float, float, float> COORDINATE;
@@ -36,6 +37,7 @@ public:
 	double CString2Double(CString str);
 	// 将Int转换为CString类型
 	CString Int2CString(int Num);
+	ProgressDlg* prodlg;
 
 	// 新的DXF解析函数
 	//void GetPlanerHull(vector<CString> FileContext, int &Planer_IDX, vector<COORDINATE> &PlateRes);

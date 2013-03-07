@@ -16,6 +16,7 @@ DXF文件的实例化类
 #include "OtherModel.h"
 #include "CruveModel.h"
 #include "PlanarModel.h"
+#include "ProDlg.h"
 
 using namespace std;
 typedef tuple<float, float, float> COORDINATE;
@@ -57,5 +58,6 @@ private:
 	vector<vector<CString>> BLK_Context;
 	//vector<vector<CString>> Planar_BLK, Cruve_BLK,Other_BLK;
 	vector<CModel> m_ModelList;// 储存DXF文件中的所有模型
+	ProgressDlg* MainPro;
 };
 

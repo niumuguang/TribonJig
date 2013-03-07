@@ -1,5 +1,7 @@
 #include "StdAfx.h"
 #include "PlanarModel.h"
+#include "ProDlg.h"
+#include "JigBlock.h"
 
 
 CPlanarModel::CPlanarModel(void)
@@ -34,15 +36,20 @@ CPlanarModel::~CPlanarModel(void)
 void CPlanarModel::DivisionData()
 {
 	// 将平面板架分割成 小块面板
+	ProgressDlg* prodlg;
+	prodlg = theApp.getProDlgHandle();
+
 	vector<CString> tempData;
 	for (int i=0; i<m_ModelData.size(); i++)
 	{
+		prodlg->m_Pro.StepIt();
 		if (m_ModelData.at(i) == "3DFACE")
 		{
 			tempData.clear();
 			int j=i;
 			for (j; j<m_ModelData.size();j++)
 			{
+				prodlg->m_Pro.StepIt();
 				tempData.push_back(m_ModelData.at(j));
 				if (m_ModelData.at(j) == "   0")
 				{
@@ -58,14 +65,23 @@ void CPlanarModel::DivisionData()
 
 void CPlanarModel::Planar_ShowList()
 {
+	ProgressDlg* prodlg;
+	prodlg = theApp.getProDlgHandle();
+
 	vector<CString> tempData;
 	int ColorIndex;
 	CString tempStr;
+	bool firstPoint = false;
+	if (theApp.getFirstX() == -1)
+	{
+		firstPoint = true;
+	}
 	float tempFloat_X = 0, tempFloat_Y = 0, tempFloat_Z = 0;
 	glNewList(m_Model_PlanarList, GL_COMPILE);
 	glBegin(GL_QUADS);
 	for (int i=0; i<m_PlateList.size(); i++)
 	{
+		prodlg->m_Pro.StepIt();
 		tempData = m_PlateList.at(i);
 		if (tempData.size() == 38)
 		{
@@ -78,6 +94,11 @@ void CPlanarModel::Planar_ShowList()
 			_stscanf(tempStr,_T("%f"),&tempFloat_Y);
 			tempStr = tempData.at(18);
 			_stscanf(tempStr,_T("%f"),&tempFloat_Z);
+			if (firstPoint == true)
+			{
+				theApp.setFirstX(tempFloat_X);theApp.setFirstY(tempFloat_Y);theApp.setFirstZ(tempFloat_Z);
+				firstPoint == false;
+			}
 			//
 			glVertex3f(tempFloat_X, tempFloat_Y, tempFloat_Z);
 			// 第二个点
@@ -118,6 +139,11 @@ void CPlanarModel::Planar_ShowList()
 			_stscanf(tempStr,_T("%f"),&tempFloat_Y);
 			tempStr = tempData.at(20);
 			_stscanf(tempStr,_T("%f"),&tempFloat_Z);
+			if (firstPoint == true)
+			{
+				theApp.setFirstX(tempFloat_X);theApp.setFirstY(tempFloat_Y);theApp.setFirstZ(tempFloat_Z);
+				firstPoint == false;
+			}
 			//
 			glVertex3f(tempFloat_X, tempFloat_Y, tempFloat_Z);
 			// 第二个点

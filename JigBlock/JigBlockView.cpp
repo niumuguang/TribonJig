@@ -205,7 +205,7 @@ void CJigBlockView::DrawScene(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//glClear(GL_COLOR_BUFFER_BIT);
 	//glPopMatrix();
-	DrawCoor();
+	//DrawCoor();
 	// Set material color, Red
 	DrawPlate();
 	//
@@ -436,6 +436,10 @@ double getDist(COORDINATE pt1, COORDINATE pt2)
 // Create Model: Planar Plate, Cruve Plate, PolyLine;
 void CJigBlockView::DrawPlate()
 {
+
+	glPushMatrix();
+	//GLfloat x = theApp.getFirstX(),y=theApp.getFirstY(),z=theApp.getFirstZ();
+	glTranslatef(-theApp.getFirstX(),-theApp.getFirstY(),-theApp.getFirstZ());
 	vector<GLuint> test = theApp.getShowListVec();
 	glColor3f(1,0,0);
 	for(int i=0; i<test.size(); i++)
@@ -458,6 +462,7 @@ void CJigBlockView::DrawPlate()
 		glCallList(test.at(i));
 		glPopMatrix();
 	}
+	glPopMatrix();
 }
 
 void CJigBlockView::DrawCoor()

@@ -25,7 +25,7 @@ typedef tuple<float, float, float> COORDINATE;
 //
 //#include <vector>
 #include "ToolBox.h"
-#include "ProgressDlg.h"
+#include "ProDlg.h"
 //#include <vector>
 
 class CJigBlockApp : public CWinApp
@@ -58,6 +58,16 @@ private:
 	GLuint testing;
 	vector<GLuint> resShowListVec;
 	vector<GLuint> resPolyListVec;
+	GLfloat first_X, first_Y, first_Z;
+
+public:
+	ProgressDlg m_prodlg;
+	GLfloat getFirstX();
+	void setFirstX(GLfloat firstX);
+	GLfloat getFirstY();
+	void setFirstY(GLfloat firstY);
+	GLfloat getFirstZ();
+	void setFirstZ(GLfloat firstZ);
 
 public:
 	vector<COORDINATE> getPlateData(void);
@@ -68,6 +78,7 @@ public:
 	vector<CModel> GetModelList();
 	vector<GLuint> getShowListVec();
 	vector<GLuint> getPolyListVec();
+	ProgressDlg* getProDlgHandle();
 };
 
 extern CJigBlockApp theApp;
